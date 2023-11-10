@@ -14,7 +14,7 @@ let DB = {
             price: 60
         },
         {
-            id: 23,
+            id: 21,
             title: "Sea of thieves",
             yearr: 2018,
             price: 40
@@ -33,18 +33,66 @@ app.get("/games", (req, res) => {
   res.json(DB.games) //Para passar uma informação no formato json
 })
 
-app.get("game/:id", (req, res) => {
+app.get("/game/:id", (req, res) => {
     if (isNaN(req.params.id)) { //isNan = não é um número
         res.sendStatus = 400 
-       console.log("Isso não é um número!")
     } else {
         let id = parseInt(req.params.id) //converte para númros inteiros
-
-        let game = DB.game.find(g => g.id == id) //pega o primeiro número que ele achar
-
+        let game = DB.games.find(g => g.id == id) //pega o primeiro número que ele achar
         if (game != undefined) {
           res.statusCode = 200
           res.json(game)
+        } else {
+            res.sendStatus(404)
+        }
+    }
+})
+
+//app.post = cadrastar + game = cadastrar um game
+app.post("/game", (req, res) => {
+    let {title, price, year} = req.body /*pega o req.body de todos de uma vez e atribui a variavel ao proprio nome*/
+    DB.games.push({
+        id:2323,
+        title,
+        price,
+        year
+    })
+    res.sendStatus(200)
+})
+
+app.delete("/game/:id", (req, res) => {
+        if (isNaN(req.params.id)) { //isNan = não é um número
+            res.sendStatus = 400 
+        } else {
+            let id = parseInt(req.params.id) //converte para númros inteiros
+            let index = DB.games.findIndex(g => g.id == id) //
+            if (index == -1) { 
+                res.sendStatus(404)
+            } else {
+                DB.games.splice(index,1) //
+                res.sendStatus(200)
+            }
+        } 
+})
+
+app.put("/game/:id", (req, res) => {
+    if (isNaN(req.params.id)) { //isNan = não é um número
+        res.sendStatus = 400 
+    } else {
+        let id = parseInt(req.params.id) //converte para númros inteiros
+        let game = DB.games.find(g => g.id == id) //pega o primeiro número que ele achar
+        if (game != undefined) { //quer dizer q existe
+            let {title, price, year} = req.body
+            if (title != undefined) {
+                game.title = title
+            }
+            if (price != undefined) {
+                game.price = price
+            }
+            if (year != undefined) {
+                game.year = year
+            } 
+            res.sendStatus(200)
         } else {
             res.sendStatus(404)
         }
