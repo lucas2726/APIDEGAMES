@@ -13,19 +13,19 @@ let DB = {
         {
             id: 23,
             title: "call of duty MW",
-            yearr: 2019,
+            year: 2019,
             price: 60
         },
         {
             id: 21,
             title: "Sea of thieves",
-            yearr: 2018,
+            year: 2018,
             price: 40
         },
         {
             id: 2,
             title: "Minecraft",
-            yearr: 2012,
+            year: 2012,
             price: 20
         }
     ]
@@ -53,8 +53,7 @@ app.get("/game/:id", (req, res) => {
 
 //app.post = cadrastar + game = cadastrar um game
 app.post("/game", (req, res) => {
-    let {title, price, year} = req.body /*pega o req.body de todos de uma vez e atribui a variavel ao proprio nome*/
-    
+    let {title, price, year} = req.body /*pega o req.body de todos de uma vez e atribui a variavel ao proprio nome. Respeitar sempre oq a API pede*/
     DB.games.push({
         id:2323,
         title,
