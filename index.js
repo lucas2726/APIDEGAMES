@@ -69,7 +69,7 @@ app.delete("/game/:id", (req, res) => {
             if (index == -1) { 
                 res.sendStatus(404)
             } else {
-                DB.games.splice(index,1) //
+                DB.games.splice(index,1) //para remover 
                 res.sendStatus(200)
             }
         } 
