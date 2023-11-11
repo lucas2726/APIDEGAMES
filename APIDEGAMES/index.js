@@ -1,6 +1,9 @@
 const express = require("express")
 const app = express()
 const bodyParser = require("body-parser")
+const cors = require("cors")
+
+app.use(cors())
 
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
@@ -51,6 +54,7 @@ app.get("/game/:id", (req, res) => {
 //app.post = cadrastar + game = cadastrar um game
 app.post("/game", (req, res) => {
     let {title, price, year} = req.body /*pega o req.body de todos de uma vez e atribui a variavel ao proprio nome*/
+    
     DB.games.push({
         id:2323,
         title,
@@ -100,5 +104,5 @@ app.put("/game/:id", (req, res) => {
 })
 
 app.listen(45678, () => {
-    console.log("Tudo certo!")
+    console.log("API rodando!")
 })
