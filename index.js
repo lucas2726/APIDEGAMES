@@ -14,20 +14,20 @@ function auth(req, res, next) {
     const authToken = req.headers['authorization']
     
     if(authToken != undefined) {
-      const berear = authToken.split(' ')
-      let token = berear[1]
+      const bearer = authToken.split(' ')
+      let token = bearer[1]
 
       jwt.verify(token, JWTsecret,(err, data) => {
       if (err) {
          res.status(401)
-         res.json({err: "Tken invalido!"})
+         res.json({err: "Token invalido!"})
       } else {
         req.token = token
         req.loggedUser = {id: data.id, email: data.email}
+        req.empresa = "Guia do programador"
         next()
       }
       })
-
     } else {
         res.status(401)
         res.json({err: "Token invalido!"})
@@ -67,7 +67,7 @@ let DB = {
             name: "Guilherme",
             email: "guigg@gmail.com",
             password: "java123"
-        },
+        }
     ]
 }
 
@@ -76,14 +76,14 @@ app.get("/games",auth, (req, res) => {
   res.json(DB.games) //Para passar uma informação no formato json
 })
 
-app.get("/game/:id", (req, res) => {
+app.get("/game/:id", auth,(req, res) => {
     if (isNaN(req.params.id)) { //isNan = não é um número
-        res.sendStatus = 400 
+        res.sendStatus(400) 
     } else {
         let id = parseInt(req.params.id) //converte para númros inteiros
         let game = DB.games.find(g => g.id == id) //pega o primeiro número que ele achar
         if (game != undefined) {
-          res.statusCode = 200
+          res.statusCode(200)
           res.json(game)
         } else {
             res.sendStatus(404)
@@ -92,7 +92,7 @@ app.get("/game/:id", (req, res) => {
 })
 
 //app.post = cadrastar + game = cadastrar um game
-app.post("/game", (req, res) => {
+app.post("/game", auth, (req, res) => {
     let {title, price, year} = req.body /*pega o req.body de todos de uma vez e atribui a variavel ao proprio nome. Respeitar sempre oq a API pede*/
     DB.games.push({
         id:2323,
@@ -103,7 +103,7 @@ app.post("/game", (req, res) => {
     res.sendStatus(200)
 })
 
-app.delete("/game/:id", (req, res) => {
+app.delete("/game/:id", auth, (req, res) => {
         if (isNaN(req.params.id)) { //isNan = não é um número
             res.sendStatus = 400 
         } else {
@@ -118,7 +118,7 @@ app.delete("/game/:id", (req, res) => {
         } 
 })
 
-app.put("/game/:id", (req, res) => {
+app.put("/game/:id", auth,(req, res) => {
     if (isNaN(req.params.id)) { //isNan = não é um número
         res.sendStatus = 400 
     } else {
