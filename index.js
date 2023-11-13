@@ -2,11 +2,37 @@ const express = require("express")
 const app = express()
 const bodyParser = require("body-parser")
 const cors = require("cors")
+const jwt = require("jsonwebtoken")
+
+const JWTsecret = "H21DDDGDYG2GYGDXYXDYNYN"
 
 app.use(cors())
-
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
+
+function auth(req, res, next) {
+    const authToken = req.headers['authorization']
+    
+    if(authToken != undefined) {
+      const berear = authToken.split(' ')
+      let token = berear[1]
+
+      jwt.verify(token, JWTsecret,(err, data) => {
+      if (err) {
+         res.status(401)
+         res.json({err: "Tken invalido!"})
+      } else {
+        req.token = token
+        req.loggedUser = {id: data.id, email: data.email}
+        next()
+      }
+      })
+
+    } else {
+        res.status(401)
+        res.json({err: "Token invalido!"})
+    }
+}
 
 let DB = {
     games: [
@@ -28,10 +54,24 @@ let DB = {
             year: 2012,
             price: 20
         }
+    ],
+    users: [
+        { 
+        id: 1,
+        name: "Victor Lima",
+        email: "victordevt@guiadoprogramador",
+        password: "nodejs<3"
+        },
+        {
+            id: 20,
+            name: "Guilherme",
+            email: "guigg@gmail.com",
+            password: "java123"
+        },
     ]
 }
 
-app.get("/games", (req, res) => {
+app.get("/games",auth, (req, res) => {
     res.statusCode = 200 //para dizer o status 
   res.json(DB.games) //Para passar uma informação no formato json
 })
@@ -100,6 +140,47 @@ app.put("/game/:id", (req, res) => {
             res.sendStatus(404)
         }
     }
+})
+
+app.post("/auth", (req, res) => {
+
+    let {email, password} = req.body
+
+    if (email != undefined) {
+
+        let user = DB.users.find(u => u.email == email) //Para achar se um email igual no BD
+
+      if (user != undefined) {
+
+        if (user.password == password) {
+
+        jwt.sign({id: user.id, email: user.email},JWTsecret,{expiresIn:'48h'}, (err, token) => {
+            if (err) {
+            res.status(400)
+            res.json({err: "Falha interna"})
+            } else {
+            res.status(200)
+            res.json({token: token})
+            }
+        })
+
+        } else {
+         res.status(401)
+         res.json({err: "Credenciais inválidas!"})
+        }
+      } else {
+       res.status(401)
+       res.json({err: "O email cadastrado não existe na base de dados!"})
+      }
+    } else {
+       res.status(400)
+       res.json({err: "O email enviado é invalido"})
+    }
+
+
+
+
+
 })
 
 app.listen(45678, () => {
