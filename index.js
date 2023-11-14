@@ -24,7 +24,6 @@ function auth(req, res, next) {
       } else {
         req.token = token
         req.loggedUser = {id: data.id, email: data.email}
-        req.empresa = "Guia do programador"
         next()
       }
       })
@@ -33,6 +32,17 @@ function auth(req, res, next) {
         res.json({err: "Token invalido!"})
     }
 }
+
+/* Esse código parece ser um middleware de autenticação em Node.js usando o pacote jsonwebtoken (jwt) para verificar tokens de acesso.
+
+- A função auth é um middleware que recebe três parâmetros: req, res, e next. É comum em frameworks como o Express.js para o Node.js.
+- const authToken = req.headers['authorization'] extrai o cabeçalho de autorização da requisição.
+- Ele verifica se o authToken está presente e, se estiver, assume que segue o padrão 'Bearer token'. Ele divide o authToken para extrair o token real.
+- Utiliza jwt.verify para verificar a validade do token usando uma chave secreta (JWTsecret).
+- Se o token for válido, adiciona informações ao objeto req (requisição), como o próprio token, dados do usuário (como id e email extraídos do token) e possivelmente informações da empresa (req.empresa = "Guia do programador").
+- Se o token não for válido ou estiver ausente, envia uma resposta de erro com status 401 e um JSON indicando que o token é inválido.
+
+Esse middleware é usado para proteger rotas ou endpoints, garantindo que apenas usuários autenticados e autorizados possam acessá-los. */
 
 let DB = {
     games: [
@@ -55,6 +65,7 @@ let DB = {
             price: 20
         }
     ],
+
     users: [
         { 
         id: 1,
@@ -63,17 +74,36 @@ let DB = {
         password: "nodejs<3"
         },
         {
-            id: 20,
-            name: "Guilherme",
-            email: "guigg@gmail.com",
-            password: "java123"
+            id: 19,
+            name: "Lucas",
+            email: "lucas@gmail.com",
+            password: "lucas123"
         }
     ]
 }
 
 app.get("/games",auth, (req, res) => {
+
+    let HATEOAS = [
+        {
+          href: "http//localhost:45678/game/"+id ,
+          method: "DELETE" ,
+          rel: "Deleta um game!"
+        },
+        {
+            href: "http//localhost:45678/game/"+id ,
+            method: "GET" ,
+            rel: "het_game" 
+        },
+        {
+            href: "http//localhost:45678/auth" ,
+            method: "POST" ,
+            rel: "login" 
+        }
+    ]
+
     res.statusCode = 200 //para dizer o status 
-  res.json(DB.games) //Para passar uma informação no formato json
+  res.json({games: DB.games, _links: HATEOAS}) //Para passar uma informação no formato json
 })
 
 app.get("/game/:id", auth,(req, res) => {
@@ -81,10 +111,34 @@ app.get("/game/:id", auth,(req, res) => {
         res.sendStatus(400) 
     } else {
         let id = parseInt(req.params.id) //converte para númros inteiros
+
+        let HATEOAS = [
+            {
+              href: "http//localhost:45678/game/"+id ,
+              method: "DELETE" ,
+              rel: "Delete_game"
+            },
+            {
+                href: "http//localhost:45678/game/"+id ,
+                method: "PUT" ,
+                rel: "edit_game!"
+              },
+            {
+                href: "http//localhost:45678/game/"+id ,
+                method: "GET" ,
+                rel: "get_game" 
+            },
+            {
+                href: "http//localhost:45678/auth" ,
+                method: "GET" ,
+                rel: "get_all_games" 
+            }
+        ]
+
         let game = DB.games.find(g => g.id == id) //pega o primeiro número que ele achar
         if (game != undefined) {
           res.statusCode(200)
-          res.json(game)
+          res.json({game, _links: HATEOAS})
         } else {
             res.sendStatus(404)
         }

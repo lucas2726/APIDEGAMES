@@ -33,6 +33,14 @@
 <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
 <script>
 
+let axiosConfig = {
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("token")
+    }
+   }
+   
+   /* O objetivo provável é configurar um cabeçalho de autorização para ser utilizado em solicitações HTTP feitas com a biblioteca Axios. A propriedade Authorization dentro do objeto headers está sendo definida para enviar um token de acesso obtido do LocalStorage.*/
+
   function login() {
     let emailField = document.getElementById("email")
     let passwordField = document.getElementById('password')
@@ -52,11 +60,14 @@
     })
   }
 
-   let axiosConfig = {
-    headers: {
-      Authorization: "Bearer" + localStorage.getItem("token")
-    }
-   }
+  /*Esse código JavaScript parece ser uma função login() que é chamada quando um formulário de login é submetido.
+
+- Ela obtém os campos de e-mail e senha do DOM.
+- Em seguida, extrai os valores digitados pelo usuário nos campos de e-mail e senha.
+- Utiliza a biblioteca axios para enviar uma solicitação POST para um endpoint http://localhost:45678/auth, enviando o e-mail e a senha como dados no corpo da requisição.
+- Se a solicitação for bem-sucedida (then), armazena o token recebido na resposta no localStorage, para persistir o token para uso posterior, e também atualiza a propriedade Authorization do objeto axiosConfig.headers com o novo token.
+- Se houver algum erro durante a solicitação (catch), exibe um alerta informando que as credenciais são inválidas.
+*/
 
      /*Front*/
    function createGame() {
